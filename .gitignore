@@ -3,6 +3,10 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+RAB_RTS_2_prototype_1/Textures/
+RAB_RTS_2_prototype_1/Fonts/
+RAB_RTS_2_Versions/
+
 # User-specific files
 *.rsuser
 *.suo
