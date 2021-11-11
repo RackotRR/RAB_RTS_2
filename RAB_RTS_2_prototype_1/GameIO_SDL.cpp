@@ -72,8 +72,8 @@ void GameIO_SDL::Begin() {
 	SDL_RenderClear(renderer);
 }
 void GameIO_SDL::End() {
-	int FPS = 1000 / (currentFrameTicks - previousFrameTicks);
-	DrawLine(Vector2(windowWidth - 50, 0), Font::Treasures, std::to_string(FPS));
+	// int FPS = 1000 / (currentFrameTicks - previousFrameTicks);
+	// DrawLine(Vector2(windowWidth - 50, 0), Font::Treasures, std::to_string(FPS));
 	SDL_RenderPresent(renderer);
 }
 
