@@ -12,5 +12,5 @@ RAB stands for "Red and Blue" - my series of games.
 #### Additional dependencies are SDL, SDL_image and SDL_ttf.
 
 ## Here are two screenshots. 
-<img src="ReadmeFiles/Screenshot1.png" width="90%">
-<img src="ReadmeFiles/Screenshot2.png" width="90%">
+<img src="ReadmeFiles/Screenshot1.png">
+<img src="ReadmeFiles/Screenshot2.png">
