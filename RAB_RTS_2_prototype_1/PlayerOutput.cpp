@@ -17,24 +17,24 @@ void PlayerOutput::Initialize(Player* player, RRGamePlay* gameplay, int width, i
 }
 
 void PlayerOutput::DrawSelectedObject() {
-	const Vector2& pos = player->GetSelectedObject()->GetPosition();
-	auto camera = player->GetCamera();
+	const Vector2& pos = player->GetSelectedObject().GetPosition();
+	auto& camera = player->GetCamera();
 
 	Rectangle rect = {
-			camera->GetDX() + pos.X * camera->GetCellSize(),
-			camera->GetDY() + pos.Y * camera->GetCellSize(),
-			camera->GetCellSize(),
-			camera->GetCellSize() };
+			camera.GetDX() + pos.X * camera.GetCellSize(),
+			camera.GetDY() + pos.Y * camera.GetCellSize(),
+			camera.GetCellSize(),
+			camera.GetCellSize() };
 	gameIO->DrawRectangle(rect, RRColor(50, 250, 50, 160));
 }
 
 void PlayerOutput::DrawWorld() {
-	auto camera = player->GetCamera();
+	auto& camera = player->GetCamera();
 	const Level* level = gameplay->GetWorld()->GetLevel();
 
-	const int size = camera->GetCellSize();
-	const int dx = camera->GetDX();
-	const int dy = camera->GetDY();
+	const int size = camera.GetCellSize();
+	const int dx = camera.GetDX();
+	const int dy = camera.GetDY();
 	
 	DrawGround(level, dx, dy, size);
 	DrawResources(level, dx, dy, size);
@@ -98,14 +98,16 @@ void PlayerOutput::DrawResources(const Level* level, int dx, int dy, int size) {
 void PlayerOutput::DrawGround(const Level* level, int dx, int dy, int size) {
 	// ground
 	for (int j = 0; j < level->height; j++)
-		for (int i = 0; i < level->width; i++) {
-			if (!player->IsActorVisible(Vector2(i, j))) continue; // если объект не видно, то пропускаем его
+		for (int i = 0; i < level->width; i++) { 
+			if (player->IsActorVisible(Vector2(i, j)) == false) 
+				continue; // если объект не видно, то пропускаем его
 
-			Rectangle rect = {
-						dx + size * i,
-						dy + size * j,
-						size,
-						size };
+			Rectangle rect{
+				dx + size * i,
+				dy + size * j,
+				size,
+				size
+			};
 
 			switch (level->ground(i, j).GetType())
 			{

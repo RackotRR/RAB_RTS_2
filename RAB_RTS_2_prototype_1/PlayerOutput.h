@@ -2,7 +2,7 @@
 class GameIO;
 class Player;
 class RRGamePlay;
-class Level;
+struct Level;
 /*
 Класс, отвечающий за вывод на экран всего, что видит игрок
 */

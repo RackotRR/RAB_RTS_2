@@ -30,12 +30,10 @@ bool GameEngine::Initialize() {
 
 
 	// инициализация игроков
-	Player* ptr = new Player;
-	ptr->Initialize(gameplay, world->GetPlayerData(0));
+	Player* ptr = new Player(gameplay, world->GetPlayerData(0));
 	players.push_back(ptr);
 
-	ptr = new Player;
-	ptr->Initialize(gameplay, world->GetPlayerData(1));
+	ptr = new Player(gameplay, world->GetPlayerData(1));
 	players.push_back(ptr);
 
 	ObjectsFactory* objectsFactory = ObjectsFactory::Instance();
@@ -50,8 +48,7 @@ bool GameEngine::Initialize() {
 
 void GameEngine::Shutdown() { 
 	// завершаем работу систем в обратном порядке
-	for (auto iter : players) {
-		iter->Shutdown();
+	for (auto iter : players) { 
 		delete iter;
 	}
 

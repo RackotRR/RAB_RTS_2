@@ -6,10 +6,10 @@
 bool RRTextureManager::Initialize(MakeTextureInfo mtinfo) { 
 	info = mtinfo;
 	// текстуры инициализируются как-то так 
-	textures[TextureType::forest] = new RRTexture(LoadTexture("Textures\\Forest.png"));
-	textures[TextureType::oil] = new RRTexture(LoadTexture("Textures\\oil.png"));
+	textures[TextureType::forest]	= new RRTexture(LoadTexture("Textures\\Forest.png"));
+	textures[TextureType::oil]		= new RRTexture(LoadTexture("Textures\\oil.png"));
 	textures[TextureType::mountain] = new RRTexture(LoadTexture("Textures\\Mountain.png"));
-	textures[TextureType::gold] = new RRTexture(LoadTexture("Textures\\gold.png"));
+	textures[TextureType::gold]		= new RRTexture(LoadTexture("Textures\\gold.png"));
 
 	textures[TextureType::factory1]   = new RRTexture(LoadTexture("Textures\\Buildings\\Factory\\Factory1.png"));
 	textures[TextureType::factory2]   = new RRTexture(LoadTexture("Textures\\Buildings\\Factory\\Factory2.png"));
@@ -47,19 +47,19 @@ bool RRTextureManager::Initialize(MakeTextureInfo mtinfo) {
 	textures[TextureType::constructing1] = new RRTexture(LoadTexture("Textures\\Constructing1.png"));
 	textures[TextureType::constructing2] = new RRTexture(LoadTexture("Textures\\Constructing2.png")); 
 
-	textures[TextureType::tank1] = new RRTexture(LoadTexture("Textures\\Tank1_1.png"));
-	textures[TextureType::tank2] = new RRTexture(LoadTexture("Textures\\Tank2_1.png"));
-	textures[TextureType::worker1] = new RRTexture(LoadTexture("Textures\\Man1.png"));
-	textures[TextureType::worker2] = new RRTexture(LoadTexture("Textures\\Man2.png"));
-	textures[TextureType::scout1] = new RRTexture(LoadTexture("Textures\\Scout1.png"));
-	textures[TextureType::scout2] = new RRTexture(LoadTexture("Textures\\Scout2.png")); 
-	textures[TextureType::hpbar1] = new RRTexture(LoadTexture("Textures\\UI\\HPBars\\HPBar_1.png")); 
-	textures[TextureType::hpbar2] = new RRTexture(LoadTexture("Textures\\UI\\HPBars\\HPBar_2.png")); 
-	textures[TextureType::hpbar3] = new RRTexture(LoadTexture("Textures\\UI\\HPBars\\HPBar_3.png")); 
-	textures[TextureType::hpbar4] = new RRTexture(LoadTexture("Textures\\UI\\HPBars\\HPBar_4.png")); 
-	textures[TextureType::hpbar5] = new RRTexture(LoadTexture("Textures\\UI\\HPBars\\HPBar_5.png")); 
-	textures[TextureType::hpbar6] = new RRTexture(LoadTexture("Textures\\UI\\HPBars\\HPBar_6.png")); 
-	textures[TextureType::tankButton] = new RRTexture(LoadTexture("Textures\\UI\\TankButton.png"));  
+	textures[TextureType::tank1]	= new RRTexture(LoadTexture("Textures\\Tank1_1.png"));
+	textures[TextureType::tank2]	= new RRTexture(LoadTexture("Textures\\Tank2_1.png"));
+	textures[TextureType::worker1]	= new RRTexture(LoadTexture("Textures\\Man1.png"));
+	textures[TextureType::worker2]	= new RRTexture(LoadTexture("Textures\\Man2.png"));
+	textures[TextureType::scout1]	= new RRTexture(LoadTexture("Textures\\Scout1.png"));
+	textures[TextureType::scout2]	= new RRTexture(LoadTexture("Textures\\Scout2.png")); 
+	textures[TextureType::hpbar1]	= new RRTexture(LoadTexture("Textures\\UI\\HPBars\\HPBar_1.png")); 
+	textures[TextureType::hpbar2]	= new RRTexture(LoadTexture("Textures\\UI\\HPBars\\HPBar_2.png")); 
+	textures[TextureType::hpbar3]	= new RRTexture(LoadTexture("Textures\\UI\\HPBars\\HPBar_3.png")); 
+	textures[TextureType::hpbar4]	= new RRTexture(LoadTexture("Textures\\UI\\HPBars\\HPBar_4.png")); 
+	textures[TextureType::hpbar5]	= new RRTexture(LoadTexture("Textures\\UI\\HPBars\\HPBar_5.png")); 
+	textures[TextureType::hpbar6]	= new RRTexture(LoadTexture("Textures\\UI\\HPBars\\HPBar_6.png")); 
+	textures[TextureType::tankButton]  = new RRTexture(LoadTexture("Textures\\UI\\TankButton.png"));  
 	textures[TextureType::scoutButton] = new RRTexture(LoadTexture("Textures\\UI\\ScoutButton.png"));
 
 	textures[TextureType::manButton]    = new RRTexture(LoadTexture("Textures\\UI\\ManButton\\ManButton.png"));  
@@ -80,7 +80,7 @@ bool RRTextureManager::Initialize(MakeTextureInfo mtinfo) {
 	textures[TextureType::buildingResIcon] = new RRTexture(LoadTexture("Textures\\UI\\BuildingResIcon.png"));
 	textures[TextureType::goldIcon] = new RRTexture(LoadTexture("Textures\\UI\\GoldIcon.png"));
 	textures[TextureType::fuelIcon] = new RRTexture(LoadTexture("Textures\\UI\\FuelIcon.png"));
-	 
+	  
 
 	return true;
 }

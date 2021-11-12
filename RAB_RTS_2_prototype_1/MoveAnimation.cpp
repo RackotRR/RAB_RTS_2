@@ -30,7 +30,7 @@ void MoveAnimation::InitializeMovingAnimation(Unit* unit) {
 }
 
 bool MoveAnimation::UpdateMovingAnimation() {
-	this->size = unit->GetMaster()->GetCamera()->GetCellSize();
+	this->size = unit->GetMaster()->GetCamera().GetCellSize();
 
 	switch (direction)
 	{

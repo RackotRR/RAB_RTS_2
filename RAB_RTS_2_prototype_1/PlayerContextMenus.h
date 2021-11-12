@@ -9,7 +9,7 @@ class Player;
 
 class PlayerContextMenus {
 public:
-	PlayerContextMenus(SelectedObject* selectedObject, World* world, Player* player);
+	PlayerContextMenus(const SelectedObject& selectedObject, World* world, Player* player);
 	~PlayerContextMenus();
 
 	// обработка ввода
@@ -26,7 +26,7 @@ public:
 private:
 	std::unordered_map<Vector2, ContextMenu*, HashVector2> contextMenus;
 	World* world;
-	SelectedObject* selectedObject;
+	const SelectedObject& selectedObject;
 	Player* player;
 };
  

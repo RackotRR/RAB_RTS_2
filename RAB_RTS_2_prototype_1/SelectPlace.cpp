@@ -4,10 +4,11 @@
 #include "World.h"
 #include "Objects.h"
 
-SelectPlace::SelectPlace(Camera* camera, World* world)
-	: camera(camera), 
-	position(Vector2::WrongPosition),
-	world(world)
+SelectPlace::SelectPlace(const Camera& camera, World* world)
+	: 
+	camera{ camera },
+	position{ Vector2::WrongPosition },
+	world{ world }
 {}
 
 bool SelectPlace::InitializePlaces(const Vector2& center) { 
@@ -44,10 +45,10 @@ void SelectPlace::GenerateOutput() const {
 	if (Selecting())
 		for (auto& iter : placesToSelect) {
 			Rectangle rect = {
-					camera->GetDX() + iter.X * camera->GetCellSize(),
-					camera->GetDY() + iter.Y * camera->GetCellSize(),
-					camera->GetCellSize(),
-					camera->GetCellSize() };
+					camera.GetDX() + iter.X * camera.GetCellSize(),
+					camera.GetDY() + iter.Y * camera.GetCellSize(),
+					camera.GetCellSize(),
+					camera.GetCellSize() };
 			GameIO::Instance()->DrawRectangle(rect, RRColor(50, 50, 250, 160));
 		}
 }

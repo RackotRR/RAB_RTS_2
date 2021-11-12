@@ -1,12 +1,17 @@
 #pragma once 
+//#include <set>
+//#include <unordered_map> 
+//#include <unordered_set>
+//#include <vector>
+#include <memory>
+
 #include "Vector2.h"
-#include <set>
-#include <unordered_map> 
-#include <unordered_set>
-#include <vector>
+#include "Camera.h"
+#include "PlayerOutput.h"
+#include "SelectedObject.h"
+
 class RRGamePlay;
-class World;
-class PlayerOutput;
+class World; 
 class Unit;
 class Worker;
 class House;
@@ -15,12 +20,10 @@ class PlayerData;
 class ContentField;
 struct RRMouse;
 class KeyboardState;
-class GameIO;
-class SelectedObject;
+class GameIO; 
 class TreasureFields;
 class PlayerContextMenus;
-class MovingObjectsQueue;
-class Camera;
+class MovingObjectsQueue; 
 class SelectPlace;
 
 
@@ -40,10 +43,10 @@ UI. Переводит то, что игрок видит и тыкает на экране
 class Player
 {
 public:
-	Player();
-
-	bool Initialize(RRGamePlay* gameplay, PlayerData* playerData);
-	void Shutdown();
+	Player(RRGamePlay* gameplay, PlayerData* playerData);
+	Player(Player&&) = default;
+	Player& operator=(Player&&) = default;
+	~Player();
 
 	// начать новый ход
 	void StartTurn();
@@ -59,10 +62,10 @@ public:
 	PlayerState GetPlayerState() const;
 	 
 	RRGamePlay* GetRRGamePlay();
-	SelectedObject* GetSelectedObject();
+	const SelectedObject& GetSelectedObject();
 	PlayerContextMenus* GetContextMenus();
 	PlayerData* GetPlayerData();
-	const Camera* GetCamera() const;
+	const Camera& GetCamera() const;
 
 	// виден ли объект по координатам
 	// проверять координаты перед передачей сюда!
@@ -89,27 +92,29 @@ private:
 	void UpdateFinishingTurn(); 
 
 	 
-	bool finished = false; 
+	bool finished{ false };
 	 
-	GameIO* gameIO;  
-	RRGamePlay* gameplay;
-	World* world;
-	PlayerOutput* playerOut;
+	GameIO* gameIO{};
+	RRGamePlay* gameplay{};
+	World* world{};
+	PlayerOutput playerOutput;
 
-	SelectedObject* selectedObject;
-	SelectPlace* selectPlace;
-	TreasureFields* treasureFields;
-	PlayerContextMenus* contextMenus;
-	MovingObjectsQueue* movingObjectsQueue;
-	Camera* camera;
-	
+	SelectedObject selectedObject;
+	SelectPlace* selectPlace{};
+	TreasureFields* treasureFields{};
+	PlayerContextMenus* contextMenus{};
+	MovingObjectsQueue* movingObjectsQueue{};
+	Camera camera;
 	 
-	int width, height;
+	size_t width, height;
 	  
 	// хранилище ресурсов(treasure) игрока и интерфейс доступа к ним
-	PlayerData* playerData;  
+	PlayerData* playerData{};
 	 
 	// состояние игрока
-	PlayerState playerState; 
+	PlayerState playerState{ PlayerState::common };
+
+	Player(Player&) = delete;
+	auto operator=(Player&) = delete;
 };
 

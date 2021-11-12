@@ -8,7 +8,7 @@ class World;
 
 class SelectPlace {
 public: 
-	SelectPlace(Camera* camera, World* world);
+	SelectPlace(const Camera& camera, World* world);
 
 	// инициализируем набор клеток для выбора
 	// возвращает false, если нет доступных клеток
@@ -29,7 +29,7 @@ public:
 	void Shutdown();
 private:
 	World* world;
-	Camera* camera; 
+	const Camera& camera; 
 	Vector2 position;
 	std::unordered_set<Vector2, HashVector2> placesToSelect;
 };

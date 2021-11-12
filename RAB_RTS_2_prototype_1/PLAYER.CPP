@@ -27,67 +27,39 @@
 #include "ObjectsFactory.h"
 
 #include "TaskProduce.h" 
- 
-
-Player::Player()
-	: gameIO(GameIO::Instance()),
-	gameplay(nullptr),
-	width(), height(), 
-	playerOut(nullptr),
-	playerData(nullptr),
-	selectedObject(nullptr),
-	selectPlace(nullptr),
-	treasureFields(nullptr),
-	contextMenus(nullptr),
-	camera(nullptr),
-	world(nullptr),
-	movingObjectsQueue(nullptr),
-	playerState(PlayerState::common)
-{
-}
-
-bool Player::Initialize(RRGamePlay* game, PlayerData* playerData) {
-	this->gameplay = game;
-	this->playerData = playerData;
-	this->world = gameplay->GetWorld();
-	this->width = world->GetLevel()->width;
-	this->height = world->GetLevel()->height;
-
-	camera = new Camera();
-
-	selectedObject = new SelectedObject(world);
+   
+Player::Player(RRGamePlay* game, PlayerData* playerData) : 
+	gameIO{ GameIO::Instance() },
+	gameplay{ game },
+	playerData{ playerData },
+	world{ game->GetWorld() },
+	width{ world->GetLevel()->width },
+	height{ world->GetLevel()->height },
+	selectedObject{ world }
+ {  
 	selectPlace = new SelectPlace(camera, world);
-
-	playerOut = new PlayerOutput;
-	playerOut->Initialize(this, game, width, height);
+	 
+	playerOutput.Initialize(this, game, width, height);
 
 	treasureFields = new TreasureFields(playerData->Treasures(), 64, 192); 
 	contextMenus = new PlayerContextMenus(selectedObject, world, this);
 
-	movingObjectsQueue = new MovingObjectsQueue(world, this);
-
-	return true;
+	movingObjectsQueue = new MovingObjectsQueue(world, this); 
 }
  
-void Player::Shutdown() { 
+Player::~Player() { 
 	delete movingObjectsQueue;
 
 	delete contextMenus;
 
-	delete treasureFields;
-	
-	delete selectedObject;
-
-	delete playerOut;
-
-	delete camera;
+	delete treasureFields; 
 }
  
 void Player::GenerateOutput() { 
-	playerOut->DrawWorld();
+	playerOutput.DrawWorld();
 
-	if (selectedObject->IsSmthSelected()) // если что-то выбрано, то нужно это нарисовать
-		playerOut->DrawSelectedObject();
+	if (selectedObject.IsSmthSelected()) // если что-то выбрано, то нужно это нарисовать
+		playerOutput.DrawSelectedObject();
 
 
 	selectPlace->GenerateOutput();
@@ -121,7 +93,7 @@ void Player::UpdateSelectingPlace(const RRMouse& mouseState) {
 	if (mouseState.Click(MouseButton::left)) { 
 		if (selectPlace->ProcessInput(mouseState)) { // если выбрали место дл€ строительства  
 			// выбранный юнит должен оставатьс€ выбранным. это должен быть рабочий
-			Unit* ptr = world->GetUnitAt(selectedObject->GetPosition());
+			Unit* ptr = world->GetUnitAt(selectedObject.GetPosition());
 			assert(ptr->GetType() == UnitType::worker); // если это не так, то надо исправл€ть
 			// пытаемс€ потратить очко передвижени€ дл€ того, чтобы начать строить
 			if (ptr->TryToSpendMovePoints()) { 
@@ -154,13 +126,13 @@ void Player::UpdateSelectingPlace(const RRMouse& mouseState) {
 		} 
 		// в любом случае, после Ћ ћ переключаемс€ в обычный режим
 		selectPlace->Shutdown();
-		selectedObject->SelectNothing();
+		selectedObject.SelectNothing();
 		SwitchState(PlayerState::common);  
 	}
 	if (mouseState.Click(MouseButton::right)) {
 		// после ѕ ћ переключаемс€ в обычный режим
 		selectPlace->Shutdown();
-		selectedObject->SelectNothing();
+		selectedObject.SelectNothing();
 		SwitchState(PlayerState::common);
 	}
 }
@@ -177,11 +149,11 @@ void Player::UpdateCommonState(const RRMouse& mouseState, const KeyboardState& k
 	}
 	if (mouseState.Click(MouseButton::right)) {
 		// если что-то выбрано, то попытаемс€ перединуть это
-		if (selectedObject->IsSmthSelected()) {
+		if (selectedObject.IsSmthSelected()) {
 			TryToMove(mouseState);
 		}
 		// в любом случае, ѕ ћ означает сн€тие выбора
-		selectedObject->SelectNothing(); 
+		selectedObject.SelectNothing(); 
 	}
 }
 
@@ -189,11 +161,11 @@ void Player::ProcessInput(const RRMouse& mouseState, const KeyboardState& keySta
 	switch (playerState)
 	{
 	case PlayerState::common:
-		camera->Update();
+		camera.Update();
 		UpdateCommonState(mouseState, keyState);
 		break;
 	case PlayerState::moveAnimation:
-		camera->Update();
+		camera.Update();
 		break;
 	case PlayerState::selectingPlace:
 		UpdateSelectingPlace(mouseState);
@@ -204,7 +176,7 @@ void Player::ProcessInput(const RRMouse& mouseState, const KeyboardState& keySta
 }
  
 void Player::StartTurn() {
-	selectedObject->SelectNothing();
+	selectedObject.SelectNothing();
 	finished = false;  
 }
 void Player::FinishTurn() { 
@@ -213,10 +185,10 @@ void Player::FinishTurn() {
 }
 
 void Player::TryToMove(const RRMouse& mouseState) {
-	ObjectType type = selectedObject->GetType();
+	ObjectType type = selectedObject.GetType();
 	if (type != ObjectType::unit) return; // передвигатьс€ могут только юниты
 
-	Unit* ptr = world->GetUnitAt(selectedObject->GetPosition());
+	Unit* ptr = world->GetUnitAt(selectedObject.GetPosition());
 	if (ptr->GetMaster() != this) return; // передвигать можно только свои юниты
 
 	// смотрим, куда тыкнули
@@ -231,15 +203,15 @@ void Player::TryToMove(const RRMouse& mouseState) {
 }
 void Player::TryToSelect(const RRMouse& mouseState) {
 	Vector2 pos = TransofrmCoordinates(Vector2(mouseState.Position.X, mouseState.Position.Y), camera);
-	selectedObject->Select(pos);
+	selectedObject.Select(pos);
 	 
 	
-	if (selectedObject->IsSmthSelected())
+	if (selectedObject.IsSmthSelected())
 		if (IsActorVisible(pos)) {// если что-то выбрано и всЄ ок, то показываем контекстное меню
 			contextMenus->ShowContextMenu();
 		}
 		else { // если объект выбран, но его не видно, то снимаем выделение
-			selectedObject->SelectNothing();
+			selectedObject.SelectNothing();
 		} 
 }
      
@@ -258,7 +230,7 @@ PlayerState Player::GetPlayerState() const {
 RRGamePlay* Player::GetRRGamePlay() {
 	return gameplay;
 }
-SelectedObject* Player::GetSelectedObject() {
+const SelectedObject& Player::GetSelectedObject() {
 	return selectedObject;
 }
 PlayerContextMenus* Player::GetContextMenus() {
@@ -267,7 +239,7 @@ PlayerContextMenus* Player::GetContextMenus() {
 PlayerData* Player::GetPlayerData() {
 	return playerData;
 }
-const Camera* Player::GetCamera() const {
+const Camera& Player::GetCamera() const {
 	return camera;
 }
 
@@ -280,14 +252,14 @@ void Player::Worker_Build(Worker* worker) {
 	// имеет ли игрок достаточно ресурсов дл€ строительства  
 	if (!playerData->Treasures()->Have(playerData->Researches()->GetPrice(task->GetObjectType()))) {
 		worker->FailedTask(); // если не имеет, то задача не выполнима
-		selectedObject->SelectNothing();
+		selectedObject.SelectNothing();
 		return;
 	}
 
 	// строить можно в 4 соседних клетках, р€дом с рабочим
 	if (!selectPlace->InitializePlaces(worker->GetPosition())) {
 		worker->FailedTask(); // если р€дом нет свободных клеток, то задача невыполнима
-		selectedObject->SelectNothing();
+		selectedObject.SelectNothing();
 		return;
 	}
 	 
@@ -312,7 +284,7 @@ void Player::Worker_Become(Worker* worker) {
 		worker->FailedTask(); // если не получилось, то сбрасываем задачу 
 	}
 
-	selectedObject->SelectNothing();
+	selectedObject.SelectNothing();
 }
  
 void Player::House_Produce(House* house) {
@@ -331,5 +303,5 @@ void Player::House_Produce(House* house) {
 		house->FailedTask();
 	}
 
-	selectedObject->SelectNothing();
+	selectedObject.SelectNothing();
 }

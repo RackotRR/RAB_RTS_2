@@ -76,7 +76,7 @@ std::unordered_set<Vector2, HashVector2> GetGroundIn(const Vector2& position, in
 bool IsPositionSuitable(const Vector2& pos, int width, int height);
  
 // превращает координаты экранные в координаты на карте
-Vector2 TransofrmCoordinates(const Vector2& screen, const Camera* player);
+Vector2 TransofrmCoordinates(const Vector2& screen, const Camera& camera);
  
 // обновляет видимые координаты для Player
 void UpdateVisibilityFor(const Level* level, int owner, Array2D<bool>& visibility);

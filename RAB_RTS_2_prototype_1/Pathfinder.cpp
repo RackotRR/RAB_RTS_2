@@ -55,12 +55,12 @@ bool IsPositionSuitable(const Vector2& pos, int levelWidth, int levelHeight) {
 		pos.Y >= 0 && pos.Y < levelHeight;
 }
  
-Vector2 TransofrmCoordinates(const Vector2& screen, const Camera* camera) { 
-	Vector2 pos = screen - Vector2(camera->GetDX(), camera->GetDY()); // получаем координату, по которой тыкнули с учётом смещения экрана
+Vector2 TransofrmCoordinates(const Vector2& screen, const Camera& camera) { 
+	Vector2 pos = screen - Vector2(camera.GetDX(), camera.GetDY()); // получаем координату, по которой тыкнули с учётом смещения экрана
 
 	bool doNotSelect = pos.X < 0 || pos.Y < 0; // исключаем неправильное приведение отрицательной координаты к int
 
-	pos /= camera->GetCellSize(); // приводим к int с округлением вниз
+	pos /= camera.GetCellSize(); // приводим к int с округлением вниз
 
 	if (doNotSelect) // если экранная координата была отрицательная, то возвращаем координату в никуда
 		pos = Vector2::WrongPosition;
@@ -121,8 +121,8 @@ void Pathfinder::WaveAlg() {
 	}
 
 	const Level* level = world->GetLevel();
-	int width = level->width;
-	int height = level->height;
+	size_t width = level->width;
+	size_t height = level->height;
 
 	 
 	std::unordered_map<Vector2, int, HashVector2> activeCells; // позиция, расстояние до неё
