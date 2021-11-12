@@ -236,7 +236,7 @@
     <ClInclude Include="RRMouse.h" />
     <ClInclude Include="MoveAbility.h" />
     <ClInclude Include="MoveAnimation.h" />
-    <ClInclude Include="Node.h" />
+    <ClInclude Include="WayNode.h" />
     <ClInclude Include="Pathfinder.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerOutput.h" />

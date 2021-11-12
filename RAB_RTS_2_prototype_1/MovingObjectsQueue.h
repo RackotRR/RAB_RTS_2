@@ -27,7 +27,7 @@ private:
 					(i.second->CurrentTask()->GetType() == task) && // у объекта есть задача
 					(i.second->GetMovePoints() > 0); // у него есть очки передвижения
 			}),
-			iter != objects.end())  // пока есть юниты, которые хотят ходить, формировать очередь
+			iter != objects.end())  // пока есть юниты, которые хотят ходить, формируем очередь
 		{
 			objectsWantedToMove.insert(iter->second); // добавляем желающего ходить
 			startIter = ++iter; // начинаем поиск с текущего

@@ -1,9 +1,10 @@
 #pragma once
-#include "MoveAnimation.h"
 #include <assert.h> 
-#include "Vector2.h"
-#include "Node.h"
 #include <stack>
+
+#include "MoveAnimation.h"
+#include "Vector2.h"
+#include "WayNode.h"
 
 class Unit;
 class World;
@@ -29,7 +30,7 @@ private:
 	/// <summary>
 	/// последовательность вершин + вес (кол-во movePoints для того, чтобы туда попасть)
 	/// </summary>
-	std::stack<Node>* way; 
+	std::stack<WayNode>* way; 
 	World* world;
 	Unit* unit;  
 };

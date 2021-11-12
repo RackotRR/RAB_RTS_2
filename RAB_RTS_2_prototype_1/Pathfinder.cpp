@@ -158,8 +158,8 @@ void Pathfinder::ConstructWay(const std::unordered_map<Vector2, int, HashVector2
 	int width = level->width;
 	int height = level->height;
 
-	way = new std::stack<Node>;
-	way->push(Node(goal, 1)); // добавим для начала клетку конца пути
+	way = new std::stack<WayNode>;
+	way->push(WayNode(goal, 1)); // добавим для начала клетку конца пути
 
 	for (int i = activeCells.at(goal); i > 0; i--) {
 		auto ptr = GetGroundIn(way->top().pos, 1, width, height); // соседние клетки   
@@ -167,7 +167,7 @@ void Pathfinder::ConstructWay(const std::unordered_map<Vector2, int, HashVector2
 			auto activeIter = activeCells.find(iter); // ищем такую среди обработанных
 			if (activeIter != activeCells.cend()) // если такая есть
 				if (activeIter->second == i) { // и она была на нужной волне
-					way->push(Node(iter, 1));  // то добавим её в путь
+					way->push(WayNode(iter, 1));  // то добавим её в путь
 					break;
 				}
 		} 

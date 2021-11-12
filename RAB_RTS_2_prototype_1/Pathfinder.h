@@ -1,8 +1,10 @@
 #pragma once 
 #include <unordered_set> 
-#include "Vector2.h"
 #include <stack>
-#include "Node.h"
+
+#include "Vector2.h"
+#include "WayNode.h"
+
 /*
 набор функций для поиска пути
 */  
@@ -27,7 +29,7 @@ public:
 	// возвращает указатель на построенный путь
 	// если цель достижима, то память надо будет самостоятельно освободить
 	// если маршрут не был построен, то будет возвращён nullptr
-	std::stack<Node>* GetWay() {
+	std::stack<WayNode>* GetWay() {
 		return way;
 	}
 
@@ -45,7 +47,7 @@ private:
 
 
 	// готовый маршрут
-	std::stack<Node>* way;
+	std::stack<WayNode>* way;
 
 	// достижима ли цель
 	bool reachable;
