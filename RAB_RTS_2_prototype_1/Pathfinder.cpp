@@ -10,13 +10,13 @@
 #include "Camera.h"
  
 
-std::unordered_set<Vector2, HashVector2> GetGroundIn(const Vector2& pos, int away, int levelWidth, int levelHeight) {
+std::unordered_set<Vector2, HashVector2> GetGroundIn(const Vector2& pos, int away, const Vector2& levelSize) {
 	std::unordered_set<Vector2, HashVector2> ground; 
 	ground.insert(pos); // первая клетка 
 	
 	if (away <= 0) { 
 		return ground; 
-	}
+	} 
 
 	std::unordered_set<Vector2, HashVector2> toAdd;
 	for (int j = 0; j < away; j++) { 
@@ -24,22 +24,22 @@ std::unordered_set<Vector2, HashVector2> GetGroundIn(const Vector2& pos, int awa
 			// проходим по всем записанным координатам и проверяем все 4 направления
 			// если новая координата будет в пределах карты, то добавляем её в список
 			Vector2 v{ cell.X + 1, cell.Y };
-			if (IsPositionSuitable(v, levelWidth, levelHeight)) {
+			if (IsPositionSuitable(v, levelSize)) {
 				toAdd.insert(v);
 			}
 
 			v = Vector2(cell.X - 1, cell.Y);
-			if (IsPositionSuitable(v, levelWidth, levelHeight)) {
+			if (IsPositionSuitable(v, levelSize)) {
 				toAdd.insert(v);
 			}
 
 			v = Vector2(cell.X, cell.Y + 1);
-			if (IsPositionSuitable(v, levelWidth, levelHeight)) {
+			if (IsPositionSuitable(v, levelSize)) {
 				toAdd.insert(v);
 			}
 
 			v = Vector2(cell.X, cell.Y - 1);
-			if (IsPositionSuitable(v, levelWidth, levelHeight)) {
+			if (IsPositionSuitable(v, levelSize)) {
 				toAdd.insert(v);
 			}
 		}
@@ -50,9 +50,10 @@ std::unordered_set<Vector2, HashVector2> GetGroundIn(const Vector2& pos, int awa
 }
 
 // возвращает true, если pos в пределах карты
-bool IsPositionSuitable(const Vector2& pos, int levelWidth, int levelHeight) { 
-	return pos.X >= 0 && pos.X < levelWidth&&
-		pos.Y >= 0 && pos.Y < levelHeight;
+bool IsPositionSuitable(const Vector2& pos, const Vector2& levelSize) {
+	auto& [width, height] = levelSize;
+	return pos.X >= 0 && pos.X < width &&
+		pos.Y >= 0 && pos.Y < height;
 }
  
 Vector2 TransofrmCoordinates(const Vector2& screen, const Camera& camera) { 
@@ -68,17 +69,14 @@ Vector2 TransofrmCoordinates(const Vector2& screen, const Camera& camera) {
 	return pos;
 }
  
-void UpdateVisibilityFor(const Level* level, int owner, Array2D<bool>& visibility) {
-	int height = level->height;
-	int width = level->width;
-
+void UpdateVisibilityFor(const Level* level, int owner, Array2D<bool>& visibility) { 
 	visibility.Fill(false);
 	 
 	// добавляем обзор со зданий
 	for (auto& buildingIter : level->buildings) {
 		if (buildingIter.second->GetOwner() == owner) {
 			std::unordered_set<Vector2, HashVector2> positions = 
-				GetGroundIn(buildingIter.second->GetPosition(), buildingIter.second->GetVisibility(), width, height);
+				GetGroundIn(buildingIter.second->GetPosition(), buildingIter.second->GetVisibility(), level->size);
 
 			for (auto& i : positions) {
 				visibility(i.X, i.Y) = true;
@@ -90,7 +88,7 @@ void UpdateVisibilityFor(const Level* level, int owner, Array2D<bool>& visibilit
 	for (auto& unitIter : level->units) {
 		if (unitIter.second->GetOwner() == owner) {
 			std::unordered_set<Vector2, HashVector2> positions =
-				GetGroundIn(unitIter.second->GetPosition(), unitIter.second->GetVisibility(), width, height);
+				GetGroundIn(unitIter.second->GetPosition(), unitIter.second->GetVisibility(), level->size);
 
 			for (auto& i : positions) {
 				visibility(i.X, i.Y) = true;
@@ -120,9 +118,7 @@ void Pathfinder::WaveAlg() {
 		return;
 	}
 
-	const Level* level = world->GetLevel();
-	size_t width = level->width;
-	size_t height = level->height;
+	const Level* level = world->GetLevel(); 
 
 	 
 	std::unordered_map<Vector2, int, HashVector2> activeCells; // позиция, расстояние до неё
@@ -135,8 +131,10 @@ void Pathfinder::WaveAlg() {
 
 	while (true) { // будем искать путь, либо пока не найдём, либо пока не поймём, что не найдём
 		for (auto& iter : activeCells) {
-			if (iter.second != currentWave) continue; // пропускаем уже обработанные ячейки
-			auto ptr = GetGroundIn(iter.first, 1, width, height); // получили клетки вокруг текущей
+			if (iter.second != currentWave) 
+				continue; // пропускаем уже обработанные ячейки
+
+			auto ptr = GetGroundIn(iter.first, 1, level->size); // получили клетки вокруг текущей
 			for (auto& iptr : ptr) {
 				int passability = GetPassability(iptr);
 				// избегаем переполнения int
@@ -173,15 +171,13 @@ void Pathfinder::WaveAlg() {
 
 void Pathfinder::ConstructWay(const std::unordered_map<Vector2, int, HashVector2>& activeCells) { 
 
-	const Level* level = world->GetLevel();
-	int width = level->width;
-	int height = level->height;
+	const Level* level = world->GetLevel(); 
 
 	way = new std::stack<WayNode>;
 	way->push(WayNode(goal, 1)); // добавим для начала клетку конца пути
 
 	for (int i = activeCells.at(goal); i > 0; i--) {
-		auto ptr = GetGroundIn(way->top().pos, 1, width, height); // соседние клетки   
+		auto ptr = GetGroundIn(way->top().pos, 1, level->size); // соседние клетки   
 		for (auto& iter : ptr) { // ищем среди соседних
 			auto activeIter = activeCells.find(iter); // ищем такую среди обработанных
 			if (activeIter != activeCells.cend()) // если такая есть

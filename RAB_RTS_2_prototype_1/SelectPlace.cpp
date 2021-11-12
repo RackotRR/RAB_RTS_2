@@ -11,11 +11,11 @@ SelectPlace::SelectPlace(const Camera& camera, World* world)
 	world{ world }
 {}
 
-bool SelectPlace::InitializePlaces(const Vector2& center) { 
+void SelectPlace::InitializePlaces(const Vector2& center) { 
 	// добавляем 4 соседние клетки:
 	 
 	const Level* level = world->GetLevel(); // уровень
-	auto ground = GetGroundIn(center, 1, level->width, level->height); // 4 соседние клетки
+	auto ground = GetGroundIn(center, 1, level->size); // 4 соседние клетки
 	// проверяем
 	for (auto& cell : ground) {
 		ObjectType type = world->CheckPosition(cell); // смотрим тип актёра
@@ -28,21 +28,19 @@ bool SelectPlace::InitializePlaces(const Vector2& center) {
 		default:
 			break;
 		}
-	}
-	// возвращаем true, если есть хоть одна клетка в наборе
-	return Selecting();
+	} 
 }
 
 const Vector2& SelectPlace::GetPlace() const {
 	return position;
 }
 
-bool SelectPlace::Selecting() const {
-	return !placesToSelect.empty();
+bool SelectPlace::IsEmpty() const {
+	return placesToSelect.empty();
 }
 
 void SelectPlace::GenerateOutput() const {
-	if (Selecting())
+	if (!IsEmpty())
 		for (auto& iter : placesToSelect) {
 			Rectangle rect = {
 					camera.GetDX() + iter.X * camera.GetCellSize(),
@@ -54,7 +52,9 @@ void SelectPlace::GenerateOutput() const {
 }
 
 bool SelectPlace::ProcessInput(const RRMouse& mouseState) {
-	if (!Selecting()) return false;
+	if (IsEmpty()) 
+		return false;
+
 	Vector2 pos = TransofrmCoordinates(mouseState.Position, camera);
 	for (auto& iter : placesToSelect) {
 		if (pos == iter) {
@@ -65,6 +65,6 @@ bool SelectPlace::ProcessInput(const RRMouse& mouseState) {
 	return false;
 }
 
-void SelectPlace::Shutdown() {
+void SelectPlace::ClearPlacesToSelect() {
 	placesToSelect.clear();
 }

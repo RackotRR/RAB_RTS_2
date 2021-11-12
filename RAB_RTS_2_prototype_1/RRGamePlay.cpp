@@ -34,7 +34,7 @@ void RRGamePlay::Move(Unit* who, const Vector2& at) {
 			// если здание строится и выбран рабочий 
 			if (building->GetUnderConstruction() && who->GetType() == UnitType::worker) {
 				// для строительства рабочий должен стоять на соседней клетке со зданием
-				auto ground = GetGroundIn(at, 1, world->GetLevel()->width, world->GetLevel()->height); 
+				auto ground = GetGroundIn(at, 1, world->GetLevel()->size); 
 				auto iter = ground.find(who->GetPosition());
 				if (iter != ground.end()) { // если он стоит рядом, то отдаём приказ
 					who->SetTask(new TaskBuildProduction{ building->GetType(), building->GetPosition() });

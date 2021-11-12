@@ -18,11 +18,11 @@ void GameFIO::Save(string path, const World* world) {
 	stream << level.name << endl; // название
 	stream << level.description << endl; // описание
 	stream << level.playersNum << endl; // кол-во игроков
-	stream << level.width << endl << level.height << endl; // размеры
+	stream << level.size.X << endl << level.size.X << endl; // размеры
 
 	// ground
-	for (int y{}; y < level.height; ++y) {
-		for (int x{}; x < level.width; ++x) {
+	for (int y{}; y < level.size.Y; ++y) {
+		for (int x{}; x < level.size.X; ++x) {
 			// типы хранятся в виде чисел
 			stream << static_cast<int>(level.ground(x, y).GetType()) << endl;
 		}
@@ -81,7 +81,7 @@ World* GameFIO::Load(string path) {
 	}
 	 
 	// параметры для создания шаблона уровня
-	size_t width, height, playersNum;
+	int width, height, playersNum;
 	std::string name, description; 
 
 	std::getline(stream, name);
@@ -118,7 +118,7 @@ World* GameFIO::Load(string path) {
 	player treasures и тому подобное
 	*/
 	// временно:
-	PlayerData* ptr = new PlayerData(level.width, level.height);
+	PlayerData* ptr = new PlayerData(level.size.X, level.size.Y);
 	ptr->Treasures()->AddGold(100);
 	ptr->Treasures()->AddBuildingRes(100);
 	ptr->Treasures()->AddFuel(100);
@@ -155,7 +155,7 @@ World* GameFIO::Load(string path) {
 	researches->SetPointsToProduceUnit(UnitType::worker, researches->GetMaxHP(UnitType::worker));
 	level.playersData.push_back(ptr);
 
-	ptr = new PlayerData(level.width, level.height);
+	ptr = new PlayerData(level.size.X, level.size.Y);
 	ptr->Treasures()->AddGold(50);
 	ptr->Treasures()->AddBuildingRes(50);
 	ptr->Treasures()->AddFuel(50);

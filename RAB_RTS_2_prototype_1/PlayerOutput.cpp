@@ -8,13 +8,14 @@
 #include "Camera.h"
  
  
-void PlayerOutput::Initialize(Player* player, RRGamePlay* gameplay, int width, int height) {
-	this->gameplay = gameplay;
-	this->gameIO = GameIO::Instance();
-	this->width = width;
-	this->height = height; 
-	this->player = player;
-}
+PlayerOutput::PlayerOutput(Player* player, RRGamePlay* gameplay, Vector2 levelSize)
+	:
+	player{ player },
+	gameIO{ GameIO::Instance() },
+	gameplay{ gameplay },
+	levelSize{ levelSize },
+	treasureFields{ player->GetPlayerData()->Treasures(), 64, 192 } // todo: заменить константы на проценты
+{}
 
 void PlayerOutput::DrawSelectedObject() {
 	const Vector2& pos = player->GetSelectedObject().GetPosition();
@@ -95,10 +96,12 @@ void PlayerOutput::DrawResources(const Level* level, int dx, int dy, int size) {
 	}
 }
 
-void PlayerOutput::DrawGround(const Level* level, int dx, int dy, int size) {
+void PlayerOutput::DrawGround(const Level* level, int dx, int dy, int size) { 
+	auto& [width, height] = level->size;
+
 	// ground
-	for (int j = 0; j < level->height; j++)
-		for (int i = 0; i < level->width; i++) { 
+	for (int j = 0; j < height; j++)
+		for (int i = 0; i < width; i++) { 
 			if (player->IsActorVisible(Vector2(i, j)) == false) 
 				continue; // если объект не видно, то пропускаем его
 
@@ -125,5 +128,11 @@ void PlayerOutput::DrawGround(const Level* level, int dx, int dy, int size) {
 				break;
 			}
 		}
+}
+ 
+
+void PlayerOutput::DrawTreasureFields() {
+	treasureFields.UpdateTreasureFields();
+	treasureFields.GenerateOutput();
 }
  

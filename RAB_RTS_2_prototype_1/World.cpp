@@ -41,9 +41,11 @@ void World::AddResource(Resource* resource) {
 }
 
 ObjectType World::CheckPosition(const Vector2& pos) const {
+	auto& [width, height] = level.size;
+
 	// позиция может быть за пределами карты
-	if (pos.X < 0 || pos.X >= level.width ||
-		pos.Y < 0 || pos.Y >= level.height)
+	if (pos.X < 0 || pos.X >= width ||
+		pos.Y < 0 || pos.Y >= height)
 		return ObjectType::none;
 
 	// это может быть здание 

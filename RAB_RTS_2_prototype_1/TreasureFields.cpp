@@ -4,7 +4,7 @@
 #include "RRTextureManager.h"
 
 TreasureFields::TreasureFields(PlayerTreasures* treasures, int fieldH, int fieldW) :  
-	treasures(treasures)
+	treasures{ treasures }
 { 
 	int space = 10;
 
@@ -33,22 +33,51 @@ TreasureFields::~TreasureFields() {
 		delete iter;
 }
 
-void TreasureFields::UpdateTreasureFields() { 
-	// вызываем перегруженную версию метода с параметрами по умолчанию
-	UpdateTreasureFields(
-		std::to_string(treasures->GetGold()),
-		std::to_string(treasures->GetBuildingRes()),
-		std::to_string(treasures->GetFuel())
-	);
+// обновление информации во всех полях
+void TreasureFields::UpdateTreasureFields() {  
+	UpdateGoldField();
+	UpdateBuildingResField();
+	UpdateFuelField();
 }
 
-void TreasureFields::UpdateTreasureFields(const std::string& gold, const std::string& buildingRes, const std::string& fuel) {
-	treasureFields[0]->SetText(gold);
-	treasureFields[1]->SetText(buildingRes);
-	treasureFields[2]->SetText(fuel);
+// заполнение информации в полях в явном виде
+void TreasureFields::FillTreasureFields(std::string gold, std::string buildingRes, std::string fuel) {
+	treasureFields[0]->SetText(std::move(gold));
+	treasureFields[1]->SetText(std::move(buildingRes));
+	treasureFields[2]->SetText(std::move(fuel));
 } 
 
 void TreasureFields::GenerateOutput() { 
 	for (auto iter : treasureFields) 
 		iter->GenerateOutput();
+}
+
+// если изменился ресурс, обновить поле
+void TreasureFields::UpdateGoldField() {
+	int gold = treasures->GetGold();
+
+	if (gold != prevGold) {
+		treasureFields[0]->SetText(std::to_string(gold));
+		prevGold = gold;
+	}
+}
+
+// если изменился ресурс, обновить поле
+void TreasureFields::UpdateBuildingResField() {
+	int buildingRes = treasures->GetBuildingRes();
+
+	if (buildingRes != prevBuildingRes) {
+		treasureFields[1]->SetText(std::to_string(buildingRes));
+		prevBuildingRes = buildingRes;
+	}
+}
+
+// если изменился ресурс, обновить поле
+void TreasureFields::UpdateFuelField() {
+	int fuel = treasures->GetFuel();
+
+	if (fuel != prevFuel) {
+		treasureFields[2]->SetText(std::to_string(fuel));
+		prevFuel = fuel;
+	}
 }

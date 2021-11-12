@@ -31,29 +31,14 @@
 Player::Player(RRGamePlay* game, PlayerData* playerData) : 
 	gameIO{ GameIO::Instance() },
 	gameplay{ game },
-	playerData{ playerData },
 	world{ game->GetWorld() },
-	width{ world->GetLevel()->width },
-	height{ world->GetLevel()->height },
-	selectedObject{ world }
- {  
-	selectPlace = new SelectPlace(camera, world);
-	 
-	playerOutput.Initialize(this, game, width, height);
-
-	treasureFields = new TreasureFields(playerData->Treasures(), 64, 192); 
-	contextMenus = new PlayerContextMenus(selectedObject, world, this);
-
-	movingObjectsQueue = new MovingObjectsQueue(world, this); 
-}
- 
-Player::~Player() { 
-	delete movingObjectsQueue;
-
-	delete contextMenus;
-
-	delete treasureFields; 
-}
+	selectedObject{ world },
+	selectPlace{ camera, world },
+	contextMenus{ selectedObject, world, this },
+	movingObjectsQueue{ world, this },
+	playerData{ playerData },
+	playerOutput{ this, game, world->GetLevel()->size }
+{}
  
 void Player::GenerateOutput() { 
 	playerOutput.DrawWorld();
@@ -62,11 +47,11 @@ void Player::GenerateOutput() {
 		playerOutput.DrawSelectedObject();
 
 
-	selectPlace->GenerateOutput();
+	selectPlace.GenerateOutput();
 
-	contextMenus->GenerateOutput();
+	contextMenus.GenerateOutput();
 
-	treasureFields->GenerateOutput(); 
+	playerOutput.DrawTreasureFields();
 }
  
 bool Player::IsActorVisible(const Vector2& pos) const {
@@ -76,22 +61,22 @@ bool Player::IsActorVisible(const Vector2& pos) const {
 void Player::Update() {   
 	UpdateFinishingTurn();
 	 
-	contextMenus->Update();  
+	contextMenus.Update();  
 }
  
 void Player::UpdateFinishingTurn() { 
 	if (finished &&  // нажали кнопку конца хода
 		playerState == PlayerState::common && // закончились анимации
-		!movingObjectsQueue->IsEmpty()) // но остались актёры, которые должны доходить
+		!movingObjectsQueue.IsEmpty()) // но остались актёры, которые должны доходить
 	{  
-		movingObjectsQueue->UpdateMovingQueue();
+		movingObjectsQueue.UpdateMovingQueue();
 	}
 }
  
 
 void Player::UpdateSelectingPlace(const RRMouse& mouseState) {
 	if (mouseState.Click(MouseButton::left)) { 
-		if (selectPlace->ProcessInput(mouseState)) { // если выбрали место для строительства  
+		if (selectPlace.ProcessInput(mouseState)) { // если выбрали место для строительства  
 			// выбранный юнит должен оставаться выбранным. это должен быть рабочий
 			Unit* ptr = world->GetUnitAt(selectedObject.GetPosition());
 			assert(ptr->GetType() == UnitType::worker); // если это не так, то надо исправлять
@@ -104,14 +89,12 @@ void Player::UpdateSelectingPlace(const RRMouse& mouseState) {
 				auto task = static_cast<TaskBuild<BuildingType>*>(ptr->CurrentTask());
 				BuildingType buildingType = task->GetObjectType();
 				// пытаемся потратить ресурсы на строительство
-				if (treasures->Transaction(researches->GetPrice(buildingType))) {
-					// если получилось, то обновляем таблички
-					treasureFields->UpdateTreasureFields();
+				if (treasures->Transaction(researches->GetPrice(buildingType))) { 
 					// и добавляем новое здание на карту
-					ObjectsFactory::Instance()->MakeBuilding(selectPlace->GetPlace(), this, buildingType);
+					ObjectsFactory::Instance()->MakeBuilding(selectPlace.GetPlace(), this, buildingType);
 
 					// устанавливаем цель строительства и заставляем рабочего строить
-					task->SetPosition(selectPlace->GetPlace());
+					task->SetPosition(selectPlace.GetPlace());
 
 					TaskBuildProduction* taskBuildProduction = new TaskBuildProduction(*task); 
 					ptr->SetTask(taskBuildProduction); 
@@ -125,13 +108,13 @@ void Player::UpdateSelectingPlace(const RRMouse& mouseState) {
 			}
 		} 
 		// в любом случае, после ЛКМ переключаемся в обычный режим
-		selectPlace->Shutdown();
+		selectPlace.ClearPlacesToSelect();
 		selectedObject.SelectNothing();
 		SwitchState(PlayerState::common);  
 	}
 	if (mouseState.Click(MouseButton::right)) {
 		// после ПКМ переключаемся в обычный режим
-		selectPlace->Shutdown();
+		selectPlace.ClearPlacesToSelect();
 		selectedObject.SelectNothing();
 		SwitchState(PlayerState::common);
 	}
@@ -143,7 +126,7 @@ void Player::UpdateCommonState(const RRMouse& mouseState, const KeyboardState& k
 		FinishTurn();
 	}
 	if (mouseState.Click(MouseButton::left)) {
-		if (contextMenus->ProcessInput(mouseState)) return;
+		if (contextMenus.ProcessInput(mouseState)) return;
 	//	if (selectPlace->ProcessInput(mouseState)) return;
 		TryToSelect(mouseState); // выбор объекта - не будет обрабатываться одновременно с выбором в меню
 	}
@@ -181,7 +164,7 @@ void Player::StartTurn() {
 }
 void Player::FinishTurn() { 
 	finished = true;   
-	movingObjectsQueue->BuildMovingQueue(TaskType::move);
+	movingObjectsQueue.BuildMovingQueue(TaskType::move);
 }
 
 void Player::TryToMove(const RRMouse& mouseState) {
@@ -194,7 +177,7 @@ void Player::TryToMove(const RRMouse& mouseState) {
 	// смотрим, куда тыкнули
 	Vector2 pos = TransofrmCoordinates(Vector2(mouseState.Position.X, mouseState.Position.Y), camera); 
 
-	if (!IsPositionSuitable(pos, width, height)) return; // тыкнули за пределами карты 
+	if (!IsPositionSuitable(pos, world->GetLevel()->size)) return; // тыкнули за пределами карты 
 	if (!IsActorVisible(pos)) return; // тыкнули за пределами видимой области
 
 	// пытаемся отдать приказ пойти туда, куда тыкнули
@@ -208,7 +191,7 @@ void Player::TryToSelect(const RRMouse& mouseState) {
 	
 	if (selectedObject.IsSmthSelected())
 		if (IsActorVisible(pos)) {// если что-то выбрано и всё ок, то показываем контекстное меню
-			contextMenus->ShowContextMenu();
+			contextMenus.ShowContextMenu();
 		}
 		else { // если объект выбран, но его не видно, то снимаем выделение
 			selectedObject.SelectNothing();
@@ -218,7 +201,7 @@ void Player::TryToSelect(const RRMouse& mouseState) {
 bool Player::Finished() const {
 	return finished && // была нажата кнопка завершения хода
 		playerState == PlayerState::common && // закончились все анимации
-		movingObjectsQueue->IsEmpty(); // все юниты закончили ходить
+		movingObjectsQueue.IsEmpty(); // все юниты закончили ходить
 }
 void Player::SwitchState(PlayerState state) {
 	playerState = state;
@@ -232,10 +215,7 @@ RRGamePlay* Player::GetRRGamePlay() {
 }
 const SelectedObject& Player::GetSelectedObject() {
 	return selectedObject;
-}
-PlayerContextMenus* Player::GetContextMenus() {
-	return contextMenus;
-}
+} 
 PlayerData* Player::GetPlayerData() {
 	return playerData;
 }
@@ -257,8 +237,9 @@ void Player::Worker_Build(Worker* worker) {
 	}
 
 	// строить можно в 4 соседних клетках, рядом с рабочим
-	if (!selectPlace->InitializePlaces(worker->GetPosition())) {
-		worker->FailedTask(); // если рядом нет свободных клеток, то задача невыполнима
+	selectPlace.InitializePlaces(worker->GetPosition()); // получаем клетки рядом
+	if (selectPlace.IsEmpty()) { // если рядом нет свободных клеток, то задача невыполнима
+		worker->FailedTask(); 
 		selectedObject.SelectNothing();
 		return;
 	}
@@ -276,8 +257,7 @@ void Player::Worker_Become(Worker* worker) {
 
 	// пытаемся заплатить за специализацию
 	if (playerData->Treasures()->Transaction(playerData->Researches()->GetPrice(task->GetObjectType()))) {
-		// если ресурсов хватило, то создаём на месте рабочего новый юнит
-		treasureFields->UpdateTreasureFields();
+		// если ресурсов хватило, то создаём на месте рабочего новый юнит 
 		ObjectsFactory::Instance()->MakeUnitAndReplace(worker, task->GetObjectType());
 	}
 	else { 
@@ -295,8 +275,7 @@ void Player::House_Produce(House* house) {
 	auto task = static_cast<TaskProduceStart<Worker>*>(house->CurrentTask());
 
 	if (playerData->Treasures()->Transaction(playerData->Researches()->GetPrice(UnitType::worker))) {
-		// если ресурсов хватило, то меняем тип задачи на настоящее производство
-		treasureFields->UpdateTreasureFields();
+		// если ресурсов хватило, то меняем тип задачи на настоящее производство 
 		house->SetTask(new TaskProduce<Worker>(task->GetValueToFinish()));
 	}
 	else {

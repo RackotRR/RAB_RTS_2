@@ -18,19 +18,18 @@ class Building;
 */
 struct Level
 {
-	Level(size_t width, size_t height, size_t playersNum)
+	Level(int width, int height, int playersNum)
 		:
 		playersNum{ playersNum },
-		width{ width },
-		height{ height },
+		size{ width, height },
 		ground{ width, height } {}
 
 	std::string name, description;
 
-	const size_t playersNum;
+	const int playersNum;
 	std::vector<PlayerData*> playersData;
 
-	const size_t width, height;
+	const Vector2 size;
 	std::unordered_map<Vector2, Unit*, HashVector2> units;
 	std::unordered_map<Vector2, Building*, HashVector2> buildings;
 	std::unordered_map<Vector2, Resource*, HashVector2> resources;

@@ -1,14 +1,11 @@
-#pragma once 
-//#include <set>
-//#include <unordered_map> 
-//#include <unordered_set>
-//#include <vector>
-#include <memory>
-
+#pragma once   
 #include "Vector2.h"
 #include "Camera.h"
 #include "PlayerOutput.h"
 #include "SelectedObject.h"
+#include "SelectPlace.h"
+#include "MovingObjectsQueue.h"
+#include "PlayerContextMenus.h"
 
 class RRGamePlay;
 class World; 
@@ -20,11 +17,7 @@ class PlayerData;
 class ContentField;
 struct RRMouse;
 class KeyboardState;
-class GameIO; 
-class TreasureFields;
-class PlayerContextMenus;
-class MovingObjectsQueue; 
-class SelectPlace;
+class GameIO;   
 
 
 enum class PlayerState {
@@ -42,11 +35,29 @@ UI. Переводит то, что игрок видит и тыкает на экране
 */ 
 class Player
 {
+	bool finished{ false };
+
+	GameIO* gameIO{};
+	RRGamePlay* gameplay{};
+	World* world{};
+
+	SelectedObject selectedObject;
+	SelectPlace selectPlace;
+	PlayerContextMenus contextMenus;
+	MovingObjectsQueue movingObjectsQueue;
+	Camera camera;
+
+	// хранилище ресурсов(treasure) игрока и интерфейс доступа к ним
+	PlayerData* playerData{};
+	PlayerOutput playerOutput;
+
+	// состояние игрока
+	PlayerState playerState{ PlayerState::common };
+
 public:
 	Player(RRGamePlay* gameplay, PlayerData* playerData);
 	Player(Player&&) = default;
-	Player& operator=(Player&&) = default;
-	~Player();
+	Player& operator=(Player&&) = default; 
 
 	// начать новый ход
 	void StartTurn();
@@ -62,8 +73,7 @@ public:
 	PlayerState GetPlayerState() const;
 	 
 	RRGamePlay* GetRRGamePlay();
-	const SelectedObject& GetSelectedObject();
-	PlayerContextMenus* GetContextMenus();
+	const SelectedObject& GetSelectedObject(); 
 	PlayerData* GetPlayerData();
 	const Camera& GetCamera() const;
 
@@ -90,29 +100,7 @@ private:
 	// выполняет действия после завершения хода 
 	// до передачи управления следующему игроку
 	void UpdateFinishingTurn(); 
-
 	 
-	bool finished{ false };
-	 
-	GameIO* gameIO{};
-	RRGamePlay* gameplay{};
-	World* world{};
-	PlayerOutput playerOutput;
-
-	SelectedObject selectedObject;
-	SelectPlace* selectPlace{};
-	TreasureFields* treasureFields{};
-	PlayerContextMenus* contextMenus{};
-	MovingObjectsQueue* movingObjectsQueue{};
-	Camera camera;
-	 
-	size_t width, height;
-	  
-	// хранилище ресурсов(treasure) игрока и интерфейс доступа к ним
-	PlayerData* playerData{};
-	 
-	// состояние игрока
-	PlayerState playerState{ PlayerState::common };
 
 	Player(Player&) = delete;
 	auto operator=(Player&) = delete;

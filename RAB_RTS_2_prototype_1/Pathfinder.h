@@ -70,10 +70,10 @@ private:
 
 
 // возвращает набор координат, находящихся на расстоянии away от position
-std::unordered_set<Vector2, HashVector2> GetGroundIn(const Vector2& position, int away, int width, int height);
+std::unordered_set<Vector2, HashVector2> GetGroundIn(const Vector2& position, int away, const Vector2& levelSize);
 
 // определяет, находится ли Position в области карты
-bool IsPositionSuitable(const Vector2& pos, int width, int height);
+bool IsPositionSuitable(const Vector2& pos, const Vector2& levelSize);
  
 // превращает координаты экранные в координаты на карте
 Vector2 TransofrmCoordinates(const Vector2& screen, const Camera& camera);
