@@ -98,7 +98,7 @@ void Player::GenerateOutput() {
 }
  
 bool Player::IsActorVisible(const Vector2& pos) const {
-	return playerData->Visibility()[pos.Y][pos.X];
+	return playerData->Visibility()(pos.X, pos.Y);
 } 
      
 void Player::Update() {   

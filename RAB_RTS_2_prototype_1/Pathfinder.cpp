@@ -1,32 +1,47 @@
+#include <limits>
+#include <algorithm>
+#include <unordered_map>
+
 #include "Pathfinder.h"
 #include "RRGamePlay.h"
 #include "World.h"
 #include "Objects.h"
 #include "Player.h"
 #include "Camera.h"
-#include <limits>
-#include <algorithm>
-#include <unordered_map>
+ 
 
-
-// сделать специализацию для away==1
-std::unordered_set<Vector2, HashVector2> GetGroundIn(const Vector2& pos, int away, int width, int height) {
+std::unordered_set<Vector2, HashVector2> GetGroundIn(const Vector2& pos, int away, int levelWidth, int levelHeight) {
 	std::unordered_set<Vector2, HashVector2> ground; 
 	ground.insert(pos); // первая клетка 
-	if (away <= 0) return ground; 
+	
+	if (away <= 0) { 
+		return ground; 
+	}
+
 	std::unordered_set<Vector2, HashVector2> toAdd;
 	for (int j = 0; j < away; j++) { 
-		for (auto& iter : ground) {
+		for (auto& cell : ground) {
 			// проходим по всем записанным координатам и проверяем все 4 направления
 			// если новая координата будет в пределах карты, то добавляем её в список
-			Vector2 v(iter.X + 1, iter.Y);
-			if (IsPositionSuitable(v, width, height)) toAdd.insert(v);
-			v = Vector2(iter.X - 1, iter.Y);
-			if (IsPositionSuitable(v, width, height)) toAdd.insert(v);
-			v = Vector2(iter.X, iter.Y + 1);
-			if (IsPositionSuitable(v, width, height)) toAdd.insert(v);
-			v = Vector2(iter.X, iter.Y - 1);
-			if (IsPositionSuitable(v, width, height)) toAdd.insert(v);
+			Vector2 v{ cell.X + 1, cell.Y };
+			if (IsPositionSuitable(v, levelWidth, levelHeight)) {
+				toAdd.insert(v);
+			}
+
+			v = Vector2(cell.X - 1, cell.Y);
+			if (IsPositionSuitable(v, levelWidth, levelHeight)) {
+				toAdd.insert(v);
+			}
+
+			v = Vector2(cell.X, cell.Y + 1);
+			if (IsPositionSuitable(v, levelWidth, levelHeight)) {
+				toAdd.insert(v);
+			}
+
+			v = Vector2(cell.X, cell.Y - 1);
+			if (IsPositionSuitable(v, levelWidth, levelHeight)) {
+				toAdd.insert(v);
+			}
 		}
 		ground.merge(toAdd); // добавляем те координаты в набор для проверок, которых ещё в нём нет
 		toAdd.clear();
@@ -34,9 +49,10 @@ std::unordered_set<Vector2, HashVector2> GetGroundIn(const Vector2& pos, int awa
 	return ground;
 }
 
-bool IsPositionSuitable(const Vector2& pos, int width, int height) {
-	return !(pos.X < 0 || pos.X >= width || // возвращает true, если pos в пределах карты
-		pos.Y < 0 || pos.Y >= height);
+// возвращает true, если pos в пределах карты
+bool IsPositionSuitable(const Vector2& pos, int levelWidth, int levelHeight) { 
+	return pos.X >= 0 && pos.X < levelWidth&&
+		pos.Y >= 0 && pos.Y < levelHeight;
 }
  
 Vector2 TransofrmCoordinates(const Vector2& screen, const Camera* camera) { 
@@ -52,42 +68,45 @@ Vector2 TransofrmCoordinates(const Vector2& screen, const Camera* camera) {
 	return pos;
 }
  
-void UpdateVisibilityFor(const Level* level, int owner, bool** visibility) { 
+void UpdateVisibilityFor(const Level* level, int owner, Array2D<bool>& visibility) {
 	int height = level->height;
 	int width = level->width;
 
-	for (int j = 0; j < height; j++)
-		for (int i = 0; i < width; i++)
-			visibility[j][i] = false;
+	visibility.Fill(false);
 	 
-	for (auto& iter : level->buildings) {
-		if (iter.second->GetOwner() == owner) {
-			std::unordered_set<Vector2, HashVector2> vectors = GetGroundIn(iter.second->GetPosition(), iter.second->GetVisibility(), width, height);
-			for (auto& i : vectors) {
-				visibility[i.Y][i.X] = true;
+	// добавляем обзор со зданий
+	for (auto& buildingIter : level->buildings) {
+		if (buildingIter.second->GetOwner() == owner) {
+			std::unordered_set<Vector2, HashVector2> positions = 
+				GetGroundIn(buildingIter.second->GetPosition(), buildingIter.second->GetVisibility(), width, height);
+
+			for (auto& i : positions) {
+				visibility(i.X, i.Y) = true;
 			}
 		}
 	}
-	for (auto& iter : level->units) {
-		if (iter.second->GetOwner() == owner) {
-			std::unordered_set<Vector2, HashVector2> vectors = GetGroundIn(iter.second->GetPosition(), iter.second->GetVisibility(), width, height);
-			for (auto& i : vectors) {
-				visibility[i.Y][i.X] = true;
+
+	// добавляем обзор с юнитов
+	for (auto& unitIter : level->units) {
+		if (unitIter.second->GetOwner() == owner) {
+			std::unordered_set<Vector2, HashVector2> positions =
+				GetGroundIn(unitIter.second->GetPosition(), unitIter.second->GetVisibility(), width, height);
+
+			for (auto& i : positions) {
+				visibility(i.X, i.Y) = true;
 			}
 		}
 	}
 }
 
 
-Pathfinder::Pathfinder(const Vector2& start, const Vector2& goal, const World* world, const Player* player, int speed) :
-	start(start), 
-	goal(goal), 
-	world(world), 
-	IMPASSABLE(INT_MAX), 
-	speed(speed), 
-	canSail(false), 
-	reachable(false),
-	way(nullptr) 
+Pathfinder::Pathfinder(const Vector2& start, const Vector2& goal, const World* world, const Player* player, int speed)
+	:
+	world{ world },
+	player{ player },
+	start{start}, 
+	goal{ goal },
+	speed{ speed }
 { 
 	WaveAlg();
 }

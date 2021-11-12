@@ -1,9 +1,11 @@
 #pragma once 
 #include <unordered_set> 
 #include <stack>
+#include <limits>
 
 #include "Vector2.h"
 #include "WayNode.h"
+#include "Array2D.h"
 
 /*
 набор функций для поиска пути
@@ -43,14 +45,13 @@ private:
 	// попробовать построить путь
 	void WaveAlg();
 	// возвращает проходимость для клетки на pos
-	int GetPassability(const Vector2& pos) const;
-
+	int GetPassability(const Vector2& pos) const; 
 
 	// готовый маршрут
-	std::stack<WayNode>* way;
+	std::stack<WayNode>* way{ nullptr };
 
 	// достижима ли цель
-	bool reachable;
+	bool reachable{ false };
 
 	const World* world;
 	const Player* player;
@@ -60,11 +61,10 @@ private:
 	int speed;
 
 	// может ли плавать
-	bool canSail;
+	bool canSail{ false };
 
 	// вес для непроходимой клетки
-	const int IMPASSABLE;
-	 
+	static constexpr int IMPASSABLE{ std::numeric_limits<int>::max() };
 };
 
 
@@ -79,4 +79,4 @@ bool IsPositionSuitable(const Vector2& pos, int width, int height);
 Vector2 TransofrmCoordinates(const Vector2& screen, const Camera* player);
  
 // обновляет видимые координаты для Player
-void UpdateVisibilityFor(const Level* level, int owner, bool** visibility);
+void UpdateVisibilityFor(const Level* level, int owner, Array2D<bool>& visibility);

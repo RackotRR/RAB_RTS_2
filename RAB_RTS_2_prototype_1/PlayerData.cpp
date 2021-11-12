@@ -1,21 +1,13 @@
 #include "PlayerData.h"
 
-PlayerData::PlayerData(int width, int height) : width(width), height(height) {
-	// ресурсы игрока
-	treasures = new PlayerTreasures;
-	// исследования
-	researches = new PlayerResearches;
-	// обзор игрока
-	visibility = new bool* [height];
-	for (int i = 0; i < height; i++)
-		visibility[i] = new bool[width];
-}
+PlayerData::PlayerData(int width, int height) 
+	:
+	researches{ new PlayerResearches },
+	treasures{ new PlayerTreasures },
+	visibility{ width, height }
+{}
 
-PlayerData::~PlayerData() {
-	// удаляем обзор игрока
-	for (int i = 0; i < height; i++)
-		delete[] visibility[i];
-	delete[] visibility;
+PlayerData::~PlayerData() { 
 	// исследования
 	delete researches;
 	// удаляем ресурсы
@@ -26,11 +18,7 @@ PlayerTreasures* PlayerData::Treasures() {
 	return treasures;
 }
 
-bool** PlayerData::Visibility(int* width, int* height) {
-	if (width)
-		*width = this->width;
-	if (height)
-		*height = this->height;
+Array2D<bool>& PlayerData::Visibility() {
 	return visibility;
 }
 
