@@ -16,13 +16,13 @@ bool SelectPlace::InitializePlaces(const Vector2& center) {
 	const Level* level = world->GetLevel(); // уровень
 	auto ground = GetGroundIn(center, 1, level->width, level->height); // 4 соседние клетки
 	// проверяем
-	for (auto& iter : ground) {
-		ObjectType type = world->CheckPosition(iter); // смотрим тип актёра
+	for (auto& cell : ground) {
+		ObjectType type = world->CheckPosition(cell); // смотрим тип актёра
 		switch (type)
 		{ 
 		case ObjectType::ground: // если это ground
-			if (level->ground[iter.Y][iter.X].GetType() != GroundType::water) // но не вода
-				placesToSelect.insert(iter); // то добавляем эту клетку в набор
+			if (level->ground(cell.X, cell.Y).GetType() != GroundType::water) // но не вода
+				placesToSelect.insert(cell); // то добавляем эту клетку в набор
 			break; 
 		default:
 			break;

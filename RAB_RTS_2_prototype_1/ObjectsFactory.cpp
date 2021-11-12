@@ -3,7 +3,7 @@
 #include "PlayerData.h"
 #include "RRTextureManager.h"
 #include "Objects.h"
-#include <assert.h>
+#include <cassert>
 #include <algorithm>
 
 ObjectsFactory::ObjectsFactory() : 

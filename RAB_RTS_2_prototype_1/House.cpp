@@ -1,8 +1,10 @@
+#include <cassert> 
+
 #include "House.h"
 #include "TaskProduce.h"
 #include "UnitType.h"
 #include "Player.h"
-#include <assert.h> 
+
 class Worker;
 
 House::House(const Vector2& position) :

@@ -1,5 +1,5 @@
 #include "HasTexture.h"
-#include <assert.h>
+#include <cassert>
 #include "RRTexture.h"
 
 HasTexture::HasTexture() : currentTexture{ 0 } 

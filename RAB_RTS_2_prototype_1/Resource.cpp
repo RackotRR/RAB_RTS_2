@@ -1,5 +1,7 @@
+#include <cassert>
+
 #include "Resource.h"
-#include <assert.h>
+
 
 Resource::Resource(const Vector2& position, int value, int maxValue, ResourceType type)
 	: Actor(position), value(value), maxValue(maxValue), type(type), HasTexture() {}

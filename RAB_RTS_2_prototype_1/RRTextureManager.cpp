@@ -1,5 +1,7 @@
+#include <cassert>
+
 #include "RRTextureManager.h"
-#include <assert.h>
+
 
 bool RRTextureManager::Initialize(MakeTextureInfo mtinfo) { 
 	info = mtinfo;

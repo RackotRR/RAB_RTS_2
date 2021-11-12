@@ -1,3 +1,6 @@
+#include <iostream>
+#include <algorithm> 
+
 #include "Player.h"
 #include "GameIO.h"
 #include "RRGamePlay.h"
@@ -23,10 +26,7 @@
 #include "Camera.h"
 #include "ObjectsFactory.h"
 
-#include "TaskProduce.h"
-
-#include <iostream>
-#include <algorithm>  
+#include "TaskProduce.h" 
  
 
 Player::Player()

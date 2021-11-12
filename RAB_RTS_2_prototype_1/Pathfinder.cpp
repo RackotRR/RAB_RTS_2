@@ -199,7 +199,7 @@ int Pathfinder::GetPassability(const Vector2& pos) const {
 	switch (type)
 	{
 	case ObjectType::ground:
-		if (world->GetLevel()->ground[pos.Y][pos.X].GetType() == GroundType::water && !canSail)
+		if (world->GetLevel()->ground(pos.X, pos.Y).GetType() == GroundType::water && canSail == false)
 			return IMPASSABLE;
 		else 
 			return 1;

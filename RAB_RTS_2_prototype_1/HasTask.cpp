@@ -1,6 +1,6 @@
 #include "HasTask.h"
 #include "Unit.h"
-#include <assert.h>
+#include <cassert>
 #include <iostream>
 
 HasTask::HasTask() : 

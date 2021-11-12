@@ -1,5 +1,7 @@
+#include <cassert>
+
 #include "PlayerTreasures.h"
-#include <assert.h>
+
 
 void PlayerTreasures::AddGold(int val) {
 	assert(val > 0);

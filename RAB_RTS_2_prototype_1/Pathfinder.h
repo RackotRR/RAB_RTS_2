@@ -10,7 +10,7 @@
 /*
 набор функций для поиска пути
 */  
-class Level;
+struct Level;
 class World;
 class Player;
 class Camera;

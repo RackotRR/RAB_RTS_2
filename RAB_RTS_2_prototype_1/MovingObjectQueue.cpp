@@ -1,6 +1,6 @@
 #include "MovingObjectsQueue.h"
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include "Objects.h"
 
 MovingObjectsQueue::MovingObjectsQueue(World* world, Player* player) : world(world), player(player) {}

@@ -1,5 +1,6 @@
 #pragma once
-#include <assert.h>
+#include <cassert>
+
 #include "TextureType.h"
 
 class ProgressBar {

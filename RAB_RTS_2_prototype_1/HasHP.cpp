@@ -1,5 +1,5 @@
+#include <cassert>
 #include "HasHP.h" 
-#include <assert.h>
 
 HasHP::HasHP() : maxHP(), hp() {}
 

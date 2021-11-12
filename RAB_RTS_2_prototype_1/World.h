@@ -6,41 +6,46 @@
 
 #include "PlayerData.h"
 #include "ObjectType.h"
+#include "Array2D.h"
+#include "Cell.h"
  
-class Resource;
-class Cell;
+class Resource; 
 class Unit;
 class Building;
-
-using std::unordered_map;
- 
-
+  
 /*
 Абстракция данных о мире. Выделенную память нужно освобождать!
 */
-class Level 
+struct Level
 {
-public:
+	Level(size_t width, size_t height, size_t playersNum)
+		:
+		playersNum{ playersNum },
+		width{ width },
+		height{ height },
+		ground{ width, height } {}
+
 	std::string name, description;
 
-	int playersNum = 0;
+	const size_t playersNum;
 	std::vector<PlayerData*> playersData;
 
-	int width = 0, height = 0;
-	unordered_map<Vector2, Unit*, HashVector2> units;
-	unordered_map<Vector2, Building*, HashVector2> buildings;
-	unordered_map<Vector2, Resource*, HashVector2> resources;
-	Cell** ground = nullptr; 
-
+	const size_t width, height;
+	std::unordered_map<Vector2, Unit*, HashVector2> units;
+	std::unordered_map<Vector2, Building*, HashVector2> buildings;
+	std::unordered_map<Vector2, Resource*, HashVector2> resources;
+	Array2D<Cell> ground; 
 };
 
 // Level - данные, World - методы доступа к ним
 // после загрузки карты, GameFIO (LevelSaver) выдаёт указатель на мир
 // после использования удалить!
-class World : private Level
+class World
 {
+private:
+	Level level;
 public:
-	World() : Level() {}
+	World(Level level) : level{ std::move(level) } {}
 	~World(); // освобождение динамически выделенной памяти
 	    
 	// переместить юнит
@@ -68,13 +73,11 @@ public:
 	void RemoveBuildingFrom(const Vector2& pos);
 	void RemoveResourceFrom(const Vector2& pos);
 
-	const Level* GetLevel() const {
-		const Level* level = static_cast<const Level*>(this);
-		return level;
+	const Level* GetLevel() const { 
+		return &level;
 	}
-	Level* GetLevel() {
-		Level* level = static_cast<Level*>(this);
-		return level;
+	Level* GetLevel() { 
+		return &level;
 	}
 	 
 	PlayerData* GetPlayerData(int i);

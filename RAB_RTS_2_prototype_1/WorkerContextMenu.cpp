@@ -1,5 +1,6 @@
+#include <cassert>
+
 #include "WorkerContextMenu.h"
-#include <assert.h>
 #include "Worker.h" 
 #include "BuildingType.h"
 

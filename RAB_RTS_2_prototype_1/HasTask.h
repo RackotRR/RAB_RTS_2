@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "Task.h"
-#include <assert.h>
+#include <cassert>
 
 enum class TurnPhase {
 	common,

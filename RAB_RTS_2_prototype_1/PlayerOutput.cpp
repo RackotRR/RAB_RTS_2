@@ -100,12 +100,14 @@ void PlayerOutput::DrawGround(const Level* level, int dx, int dy, int size) {
 	for (int j = 0; j < level->height; j++)
 		for (int i = 0; i < level->width; i++) {
 			if (!player->IsActorVisible(Vector2(i, j))) continue; // если объект не видно, то пропускаем его
+
 			Rectangle rect = {
 						dx + size * i,
 						dy + size * j,
 						size,
 						size };
-			switch (level->ground[j][i].GetType())
+
+			switch (level->ground(i, j).GetType())
 			{
 			case GroundType::grass:
 				gameIO->DrawRectangle(rect, RRColor(0, 255, 0));

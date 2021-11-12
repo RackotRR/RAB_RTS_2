@@ -1,7 +1,8 @@
 #pragma once 
-#include <assert.h>
+#include <cassert>
 #include <vector>
 #include <stdint.h>
+
 #include "ContextMenuItem.h" 
 #include "RRTextureManager.h"
 #include "GameIO.h" 

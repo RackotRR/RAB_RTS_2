@@ -1,6 +1,7 @@
+#include <cassert> 
+
 #include "GameFIO.h" 
 #include "Objects.h"
-#include <assert.h> 
 
 using std::ofstream;
 using std::ifstream;
@@ -20,10 +21,10 @@ void GameFIO::Save(string path, const World* world) {
 	stream << level.width << endl << level.height << endl; // размеры
 
 	// ground
-	for (int j = 0; j < level.height; ++j) {
-		for (int i = 0; i < level.width; ++i) { 
+	for (int y{}; y < level.height; ++y) {
+		for (int x{}; x < level.width; ++x) {
 			// типы хранятся в виде чисел
-			stream << static_cast<int>(level.ground[j][i].GetType()) << endl;
+			stream << static_cast<int>(level.ground(x, y).GetType()) << endl;
 		}
 	}
 
@@ -78,28 +79,30 @@ World* GameFIO::Load(string path) {
 		stream.close(); 
 		return nullptr; // возвращает nullptr при ошибке
 	}
-	
-	World* world = new World; // выделяет память для мира (освобождается где-то в другом месте)
-	Level& level = *(world->GetLevel()); // ссылка на данные о мире
+	 
+	// параметры для создания шаблона уровня
+	size_t width, height, playersNum;
+	std::string name, description; 
 
-	std::getline(stream, level.name);
-	std::getline(stream, level.description); 
-	stream >> level.playersNum;
-	stream >> level.width >> level.height;
+	std::getline(stream, name);
+	std::getline(stream, description); 
+	stream >> playersNum;
+	stream >> width >> height;
+	 
+	// создаём шаблон, после чего заполняем реальными данными
+	Level level{ width, height, playersNum }; // данные о мире
+	level.name = std::move(name);
+	level.description = std::move(description);
 
-	// ground
-	{ 
-		level.ground = new Cell * [level.height]; // выделяется память под двумерный массив клеток
-		for (int i = 0; i < level.height; i++)
-			level.ground[i] = new Cell[level.width];
+	// ground 
 
-		for (int j = 0; j < level.height; j++)
-			for (int i = 0; i < level.width; i++) {
-				int a = 0;
-				stream >> a; 
-				level.ground[j][i].SetType(static_cast<GroundType>(a)); // для каждой клетки устанавливается её тип
-			}
-	};
+	for (size_t y{}; y < height; ++y) {
+		for (size_t x{}; x < width; ++x) {
+			int a = 0;
+			stream >> a;
+			level.ground(x, y).SetType(static_cast<GroundType>(a)); // для каждой клетки устанавливается её тип
+		}
+	}
 
 	// resources
 	LoadResources(stream, level);
@@ -188,8 +191,8 @@ World* GameFIO::Load(string path) {
 	researches->SetPointsToProduceUnit(UnitType::tank, researches->GetMaxHP(UnitType::tank));
 	researches->SetPointsToProduceUnit(UnitType::worker, researches->GetMaxHP(UnitType::worker));
 	level.playersData.push_back(ptr);
-
-	return world;
+	 
+	return new World(std::move(level)); // выделяет память для мира (освобождается где-то в другом месте)
 }
  
 void GameFIO::LoadUnits(ifstream& stream, Level& level) {

@@ -1,5 +1,7 @@
+#include <cassert>
+
 #include "PlayerResearches.h"
-#include <assert.h>
+
 
 void PlayerResearches::SetMaxHP(BuildingType buildingType, int hp) {
 	buildingsMaxHP[buildingType] = hp;

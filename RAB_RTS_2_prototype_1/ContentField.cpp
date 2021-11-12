@@ -1,7 +1,8 @@
+#include <cassert>
 #include "ContentField.h"
 #include "GameIO.h"
 #include "RRTextureManager.h"
-#include <assert.h>
+
 
 ContentField::ContentField(const Rectangle& rect) : HasTexture(), rect(rect), text() {
 	AddTexture(RRTextureManager::Instance()->GetTexture(TextureType::field));

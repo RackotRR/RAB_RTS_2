@@ -1,5 +1,5 @@
+#include <cassert>
 #include "UnderConstruction.h"
-#include <assert.h>
 #include "Building.h"
  
 int UnderConstruction::GetUnderConstruction() const {
