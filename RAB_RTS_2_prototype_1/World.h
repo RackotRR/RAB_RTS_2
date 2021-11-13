@@ -1,41 +1,6 @@
 #pragma once
-#include <vector>
-#include <unordered_map> 
-#include <string> 
-
-#include "Vector2.h"
-#include "PlayerData.h"
-#include "ObjectType.h"
-#include "Array2D.h"
-#include "Cell.h"
- 
-class Resource; 
-class Unit;
-class Building;
+#include "Level.h"
   
-/*
-Абстракция данных о мире. Выделенную память нужно освобождать!
-*/
-struct Level
-{
-	Level(int width, int height, int playersNum)
-		:
-		playersNum{ playersNum },
-		size{ width, height },
-		ground{ width, height } {}
-
-	std::string name, description;
-
-	const int playersNum;
-	std::vector<PlayerData*> playersData;
-
-	const Vector2 size;
-	std::unordered_map<Vector2, Unit*, HashVector2> units;
-	std::unordered_map<Vector2, Building*, HashVector2> buildings;
-	std::unordered_map<Vector2, Resource*, HashVector2> resources;
-	Array2D<Cell> ground; 
-};
-
 // Level - данные, World - методы доступа к ним
 // после загрузки карты, GameFIO (LevelSaver) выдаёт указатель на мир
 // после использования удалить!
@@ -44,8 +9,8 @@ class World
 private:
 	Level level;
 public:
-	World(Level level) : level{ std::move(level) } {}
-	~World(); // освобождение динамически выделенной памяти
+	World(Level&& level) : level{ std::move(level) } {}
+	//~World(); // освобождение динамически выделенной памяти
 	    
 	// переместить юнит
 	void ReplaceUnit(const Vector2& key, Unit* unit);

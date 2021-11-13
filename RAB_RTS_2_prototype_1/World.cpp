@@ -1,22 +1,23 @@
 #include <cassert>
+#include <iostream>
 
 #include "World.h"  
 #include "Pathfinder.h"
 #include "Objects.h"
-   
-World::~World() {  
-	for (auto& iter : level.units)
-		delete iter.second; 
 
-	for (auto& iter : level.buildings)
-		delete iter.second; 
-
-	for (auto& iter : level.resources)
+Level::~Level() {  
+	for (auto& iter : units)
 		delete iter.second;
 
-	for (auto& iter : level.playersData)
+	for (auto& iter : buildings)
+		delete iter.second;
+
+	for (auto& iter : resources)
+		delete iter.second;
+
+	for (auto& iter : playersData)
 		delete iter;
-}
+} 
 
 void World::ReplaceUnit(const Vector2& key, Unit* unit) {
 	auto iter = level.units.find(key);

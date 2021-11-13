@@ -223,6 +223,7 @@
     <ClInclude Include="House.h" />
     <ClInclude Include="HouseContextMenu.h" />
     <ClInclude Include="KeyboardState.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="MovingObjectsQueue.h" />
     <ClInclude Include="Objects.h" />
     <ClInclude Include="ObjectsFactory.h" />

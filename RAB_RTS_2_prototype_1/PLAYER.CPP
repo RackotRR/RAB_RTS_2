@@ -171,8 +171,8 @@ void Player::TryToMove(const RRMouse& mouseState) {
 	ObjectType type = selectedObject.GetType();
 	if (type != ObjectType::unit) return; // передвигаться могут только юниты
 
-	Unit* ptr = world->GetUnitAt(selectedObject.GetPosition());
-	if (ptr->GetMaster() != this) return; // передвигать можно только свои юниты
+	Unit* unit = world->GetUnitAt(selectedObject.GetPosition());
+	if (unit->GetMaster() != this) return; // передвигать можно только свои юниты
 
 	// смотрим, куда тыкнули
 	Vector2 pos = TransofrmCoordinates(Vector2(mouseState.Position.X, mouseState.Position.Y), camera); 
@@ -181,7 +181,7 @@ void Player::TryToMove(const RRMouse& mouseState) {
 	if (!IsActorVisible(pos)) return; // тыкнули за пределами видимой области
 
 	// пытаемся отдать приказ пойти туда, куда тыкнули
-	gameplay->Move(ptr, pos); 
+	gameplay->Move(unit, pos);
 
 }
 void Player::TryToSelect(const RRMouse& mouseState) {
