@@ -42,7 +42,7 @@ void World::AddResource(Resource* resource) {
 }
 
 ObjectType World::CheckPosition(const Vector2& pos) const {
-	auto& [width, height] = level.size;
+	auto& [width, height] = GetSize();
 
 	// позиция может быть за пределами карты
 	if (pos.X < 0 || pos.X >= width ||

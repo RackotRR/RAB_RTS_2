@@ -116,10 +116,7 @@ void Pathfinder::WaveAlg() {
 		reachable = false;
 		way = nullptr;
 		return;
-	}
-
-	const Level* level = world->GetLevel(); 
-
+	}  
 	 
 	std::unordered_map<Vector2, int, HashVector2> activeCells; // позиция, расстояние до неё
 	activeCells.insert(std::pair(start, 0));
@@ -134,7 +131,7 @@ void Pathfinder::WaveAlg() {
 			if (iter.second != currentWave) 
 				continue; // пропускаем уже обработанные ячейки
 
-			auto ptr = GetGroundIn(iter.first, 1, level->size); // получили клетки вокруг текущей
+			auto ptr = GetGroundIn(iter.first, 1, world->GetSize()); // получили клетки вокруг текущей
 			for (auto& iptr : ptr) {
 				int passability = GetPassability(iptr);
 				// избегаем переполнения int
@@ -169,15 +166,12 @@ void Pathfinder::WaveAlg() {
 	}
 }
 
-void Pathfinder::ConstructWay(const std::unordered_map<Vector2, int, HashVector2>& activeCells) { 
-
-	const Level* level = world->GetLevel(); 
-
+void Pathfinder::ConstructWay(const std::unordered_map<Vector2, int, HashVector2>& activeCells) {  
 	way = new std::stack<WayNode>;
 	way->push(WayNode(goal, 1)); // добавим для начала клетку конца пути
 
 	for (int i = activeCells.at(goal); i > 0; i--) {
-		auto ptr = GetGroundIn(way->top().pos, 1, level->size); // соседние клетки   
+		auto ptr = GetGroundIn(way->top().pos, 1, world->GetSize()); // соседние клетки   
 		for (auto& iter : ptr) { // ищем среди соседних
 			auto activeIter = activeCells.find(iter); // ищем такую среди обработанных
 			if (activeIter != activeCells.cend()) // если такая есть

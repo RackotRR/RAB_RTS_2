@@ -8,12 +8,12 @@
 #include "Camera.h"
  
  
-PlayerOutput::PlayerOutput(Player* player, RRGamePlay* gameplay, Vector2 levelSize)
+PlayerOutput::PlayerOutput(Player* player, RRGamePlay* gameplay)
 	:
 	player{ player },
 	gameIO{ GameIO::Instance() },
 	gameplay{ gameplay },
-	levelSize{ levelSize },
+	level{ gameplay->GetWorld()->GetLevel() },
 	treasureFields{ player->GetPlayerData()->Treasures(), 64, 192 } // todo: заменить константы на проценты
 {}
 
@@ -30,20 +30,19 @@ void PlayerOutput::DrawSelectedObject() {
 }
 
 void PlayerOutput::DrawWorld() {
-	auto& camera = player->GetCamera();
-	const Level* level = gameplay->GetWorld()->GetLevel();
+	auto& camera = player->GetCamera(); 
 
 	const int size = camera.GetCellSize();
 	const int dx = camera.GetDX();
 	const int dy = camera.GetDY();
 	
-	DrawGround(level, dx, dy, size);
-	DrawResources(level, dx, dy, size);
-	DrawUnits(level, dx, dy, size);
-	DrawBuildings(level, dx, dy, size);
+	DrawGround(dx, dy, size);
+	DrawResources(dx, dy, size);
+	DrawUnits(dx, dy, size);
+	DrawBuildings(dx, dy, size);
 }
  
-void PlayerOutput::DrawUnits(const Level* level, int dx, int dy, int size) {
+void PlayerOutput::DrawUnits(int dx, int dy, int size) {
 	bool existMovedUnit = false;
 	Vector2 keyMovedUnit; // данные для перемещение юнита
 	Unit* who = nullptr;
@@ -70,7 +69,7 @@ void PlayerOutput::DrawUnits(const Level* level, int dx, int dy, int size) {
 		gameplay->GetWorld()->ReplaceUnit(keyMovedUnit, who); 
 }
 
-void PlayerOutput::DrawBuildings(const Level* level, int dx, int dy, int size) {
+void PlayerOutput::DrawBuildings(int dx, int dy, int size) {
 	// buildings
 	for (auto& iter : level->buildings) {
 		if (!player->IsActorVisible(iter.second->GetPosition())) continue; // если объект не видно, то пропускаем его
@@ -83,7 +82,7 @@ void PlayerOutput::DrawBuildings(const Level* level, int dx, int dy, int size) {
 	}
 }
 
-void PlayerOutput::DrawResources(const Level* level, int dx, int dy, int size) {
+void PlayerOutput::DrawResources(int dx, int dy, int size) {
 	// resources
 	for (auto& iter : level->resources) {
 		if (!player->IsActorVisible(iter.second->GetPosition())) continue; // если объект не видно, то пропускаем его
@@ -96,12 +95,12 @@ void PlayerOutput::DrawResources(const Level* level, int dx, int dy, int size) {
 	}
 }
 
-void PlayerOutput::DrawGround(const Level* level, int dx, int dy, int size) { 
-	auto& [width, height] = level->size;
+void PlayerOutput::DrawGround(int dx, int dy, int size) {  
+	const auto& ground{ level->ground };
 
 	// ground
-	for (int j = 0; j < height; j++)
-		for (int i = 0; i < width; i++) { 
+	for (int j = 0; j < ground.SizeY(); j++)
+		for (int i = 0; i < ground.SizeX(); i++) { 
 			if (player->IsActorVisible(Vector2(i, j)) == false) 
 				continue; // если объект не видно, то пропускаем его
 
@@ -112,7 +111,7 @@ void PlayerOutput::DrawGround(const Level* level, int dx, int dy, int size) {
 				size
 			};
 
-			switch (level->ground(i, j).GetType())
+			switch (ground(i, j).GetType())
 			{
 			case GroundType::grass:
 				gameIO->DrawRectangle(rect, RRColor(0, 255, 0));

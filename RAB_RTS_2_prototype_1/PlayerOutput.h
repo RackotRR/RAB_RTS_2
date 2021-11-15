@@ -14,7 +14,7 @@ struct Level;
 class PlayerOutput
 {
 public:
-	PlayerOutput(Player* player, RRGamePlay* gameplay, Vector2 levelSize);
+	PlayerOutput(Player* player, RRGamePlay* gameplay);
 	  
 	// отрисовка мира с точки зрения игрока
 	void DrawWorld();
@@ -25,16 +25,16 @@ public:
 	// нарисовать таблички с ресурсами игрока
 	void DrawTreasureFields();
 private:
-	void DrawUnits(const Level* level, int dx, int dy, int size);
-	void DrawBuildings(const Level* level, int dx, int dy, int size);
-	void DrawResources(const Level* level, int dx, int dy, int size);
-	void DrawGround(const Level* level, int dx, int dy, int size);
+	void DrawUnits(int dx, int dy, int size);
+	void DrawBuildings(int dx, int dy, int size);
+	void DrawResources(int dx, int dy, int size);
+	void DrawGround(int dx, int dy, int size);
 	 
 
 	Player* player;
 	GameIO* gameIO;
-	RRGamePlay* gameplay; 
-	Vector2 levelSize;
+	RRGamePlay* gameplay;  
+	const Level* level;
 
 	TreasureFields treasureFields;
 };

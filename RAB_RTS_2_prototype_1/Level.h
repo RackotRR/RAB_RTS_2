@@ -14,7 +14,7 @@ class Unit;
 class Building;
 
 /*
-Абстракция данных о мире. Выделенную память нужно освобождать!
+Абстракция данных о мире 
 */
 struct Level
 {
@@ -34,8 +34,8 @@ struct Level
 
 	~Level();
 
-	const int playersNum;
-	const Vector2 size;
+	const int playersNum; 
+	const Vector2 size; 
 	Array2D<Cell> ground;
 
 	std::string name, description; 

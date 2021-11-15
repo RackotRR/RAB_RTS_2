@@ -37,7 +37,7 @@ Player::Player(RRGamePlay* game, PlayerData* playerData) :
 	contextMenus{ selectedObject, world, this },
 	movingObjectsQueue{ world, this },
 	playerData{ playerData },
-	playerOutput{ this, game, world->GetLevel()->size }
+	playerOutput{ this, game }
 {}
  
 void Player::GenerateOutput() { 
@@ -177,7 +177,7 @@ void Player::TryToMove(const RRMouse& mouseState) {
 	// смотрим, куда тыкнули
 	Vector2 pos = TransofrmCoordinates(Vector2(mouseState.Position.X, mouseState.Position.Y), camera); 
 
-	if (!IsPositionSuitable(pos, world->GetLevel()->size)) return; // тыкнули за пределами карты 
+	if (!IsPositionSuitable(pos, world->GetSize())) return; // тыкнули за пределами карты 
 	if (!IsActorVisible(pos)) return; // тыкнули за пределами видимой области
 
 	// пытаемся отдать приказ пойти туда, куда тыкнули

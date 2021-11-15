@@ -37,6 +37,10 @@ public:
 	void RemoveBuildingFrom(const Vector2& pos);
 	void RemoveResourceFrom(const Vector2& pos);
 
+	const Vector2& GetSize() const {
+		return level.size;
+	}
+
 	const Level* GetLevel() const { 
 		return &level;
 	}
